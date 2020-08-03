@@ -21,6 +21,7 @@ public class App {
 	
 	private static final int MAX_PITCH = 127;
 	
+	private static final String HELP_ARG = "--help";
 	private static final String IP_ARG_LONG = "--ip";
 	private static final String IP_ARG_SHORT = "-i";
 	private static final String PORT_ARG_LONG = "--port";
@@ -38,7 +39,21 @@ public class App {
 		String accessToken = getStringArg(API_KEY_ARG_LONG, API_KEY_ARG_SHORT, null, args);
 		String keyStart = getStringArg(KEY_START_ARG_LONG, KEY_START_ARG_SHORT, null, args);
 		String keyEnd = getStringArg(KEY_END_ARG_LONG, KEY_END_ARG_SHORT, null, args);
+		boolean help = hasArg(HELP_ARG, null, false, args);
+		if (help) {
+			printHelp();
+		}
 		setup(ip, port, accessToken, keyStart, keyEnd);
+	}
+	
+	private static boolean hasArg(String arg, String shortArg,
+			boolean defaultArg, String[] args) {
+		for (String a : args) {
+			if ((arg != null && a.equals(arg)) || a.equals(shortArg)) {
+				return true;
+			}
+		}
+		return defaultArg;
 	}
 	
 	private static String getStringArg(String arg, String shortArg,
@@ -114,12 +129,12 @@ public class App {
 		
 		if (keyStart == null) {
 			System.out.print("Enter the leftmost key on your keyboard (for example, A0): ");
-			keyStart = in.nextLine();
+			keyStart = in.next();
 		}
 		
 		if (keyEnd == null) {
-			System.out.println("Enter the rightmost key on your keyboard (for example, C8): ");
-			keyEnd = in.nextLine();
+			System.out.print("Enter the rightmost key on your keyboard (for example, C8): ");
+			keyEnd = in.next();
 		}
 		
 		System.out.println("Select a MIDI device:");
@@ -129,17 +144,20 @@ public class App {
 		}
 		int midiIndex = in.nextInt() - 1;
 		
+		MidiDevice device = null;
 		try {
-			openDevice(midiIndex, new OutputReceiver(aurora,
+			device = openDevice(midiIndex, new OutputReceiver(aurora,
 					noteToPitch(keyStart), noteToPitch(keyEnd)));
 		} catch (StatusCodeException | IOException | MidiUnavailableException e) {
 			System.out.println("Failed to open MIDI device.");
 			System.exit(4);
 		}
 		
-		System.out.println("Pianoleaf is now active. Press 'q' to exit.");
+		System.out.println("\nPianoleaf is now active.\nPress any key + enter to exit.");
 		
-		while (!in.nextLine().equals("q"));
+		while (in.next().equals(""));
+		
+		device.close();
 	}
 	
 	// Converts an octave+note pair to its MIDI pitch equivalent.
@@ -184,5 +202,23 @@ public class App {
 		trans.setReceiver(receiver);
 		device.open();
 		return device;
+	}
+	
+	static void printHelp() {
+		System.out.println("Usage: pianoleaf [-i ip] [-p port] [-a api_key] [-s start_key] [-e end_key]");
+		System.out.println("Tool for syncing Nanoleaf devices with a MIDI keyboard.");
+		System.out.println("\nOptions:");
+		System.out.println("  -i, --ip              specifies the IP address for the Nanoleaf device");
+		System.out.println("  -p, --port            specifies the port for the Nanoleaf device");
+		System.out.println("  -a, --api-key         Set the api key for the Nanoleaf device (returned after manual setup)");
+		System.out.println("  -s, --key-start       Set the leftmost key on your MIDI keyboard in the format NOTEOCTAVE (usually set \"A0\")");
+		System.out.println("  -e, --key-end         Set the rightmost key on your MIDI keyboard in the format NOTEOCTAVE (usually set \"C8\")");
+		System.out.println("      --help            display this help and exit");
+		System.out.println("\nExit status:");
+		System.out.println("1  mDNS error when searching for Nanoleaf devices");
+		System.out.println("2  no Nanoleaf devices found");
+		System.out.println("3  failed to connect to the selected Nanoleaf device");
+		System.out.println("4  failed to open the selected MIDI device");
+		System.exit(0);
 	}
 }
