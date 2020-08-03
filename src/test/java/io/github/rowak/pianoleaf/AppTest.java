@@ -1,20 +1,13 @@
 package io.github.rowak.pianoleaf;
 
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
 
-/**
- * Unit test for simple App.
- */
 public class AppTest 
 {
-    /**
-     * Rigorous Test :-)
-     */
     @Test
-    public void shouldAnswerWithTrue()
-    {
-        assertTrue( true );
+    public void shouldAnswerWith60() {
+    	System.out.println(App.noteToPitch("C4"));
+    	System.out.println(App.noteToPitch("A0"));
+    	System.out.println(App.noteToPitch("C8"));
     }
 }

@@ -13,6 +13,7 @@ public class OutputReceiver implements Receiver {
 	
 	private final int NOTE_ON = -112;
 	private final int NOTE_OFF = -128;
+	private final int MAX_VELOCITY = 127;
 	
 	private int keyStart;
 	private int keyEnd;
@@ -40,9 +41,13 @@ public class OutputReceiver implements Receiver {
 			System.out.print(data[i] + " ");
 		}
 		System.out.println();
+		
+		final int noteState = data[0];
+		final int notePitch = data[1];
+		final int noteVelocity = data[2];
 
-		if ((int)data[0] == NOTE_ON) {
-			final int columnIndex = getNotePanelColumnIndex((int)data[1] - keyStart);
+		if (noteState == NOTE_ON) {
+			final int columnIndex = getNotePanelColumnIndex(notePitch);
 			if (!activeColumns[columnIndex]) {
 				activeColumns[columnIndex] = true;
 				new Thread(new Runnable() {
@@ -50,8 +55,10 @@ public class OutputReceiver implements Receiver {
 					public void run() {
 						Panel[] column = panelColumns[columnIndex];
 						for (int i = 0; i < column.length; i++) {
-							int[] rgb = hsbToRgb((int) (360 * (columnIndex / (float) panelColumns.length)), 1, 1);
-							setPanel(column[i], rgb, 5);
+							float hue = 360 * (columnIndex / (float)panelColumns.length);
+							float brightness = (noteVelocity + 30 > MAX_VELOCITY ? MAX_VELOCITY : noteVelocity + 30) / (float)MAX_VELOCITY;
+							int[] rgb = hsbToRgb(hue, 1, brightness);
+							setPanel(column[i], rgb, 4);
 						}
 						try {
 							Thread.sleep(200);
@@ -59,7 +66,7 @@ public class OutputReceiver implements Receiver {
 							e.printStackTrace();
 						}
 						for (int i = 0; i < column.length; i++) {
-							setPanel(column[i], new int[]{0, 0, 0}, 5);
+							setPanel(column[i], new int[]{0, 0, 0}, 10);
 						}
 						activeColumns[columnIndex] = false;
 					}
@@ -72,16 +79,17 @@ public class OutputReceiver implements Receiver {
 	public void close() {}
 
 	private int getNotePanelColumnIndex(int note) {
-		return (int)((note / (float)(keyEnd - keyStart)) * panelColumns.length);
+//		return (int)((note / (float)(keyEnd - keyStart)) * panelColumns.length);
+		return (int)((note / (float)128) * panelColumns.length);
 	}
 
-	private int[] hsbToRgb(int h, int s, int b) {
-		return new int[] {f(5, h, s, b)*255, f(3, h, s, b)*255, f(1, h, s, b)*255};
+	private int[] hsbToRgb(float h, float s, float b) {
+		return new int[] {(int)(f(5, h, s, b)*255), (int)(f(3, h, s, b)*255), (int)(f(1, h, s, b)*255)};
 	}
 
-	private int f(int n, int h, int s, int b) {
-		int k = (n + h / 60) % 6;
-		return b - b*s*Math.max(0, min(k, 4-k, 1));
+	private float f(int n, float h, float s, float b) {
+		float k = (n + h / 60) % 6;
+		return b - b*s*Math.max(0, min((int)k, (int)(4-k), 1));
 	}
 
 	private int min(int a, int b, int c) {
