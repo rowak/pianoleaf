@@ -2,7 +2,7 @@
 This is a command line tool for syncing your Nanoleaf lights with a MIDI keyboard.
 
 ## Usage
-Download the latest jar file from the [releases](https://github.com/rowak/pianoleaf/releases) page. **Plug your MIDI keyboard into your computer by USB.** Open up a terminal and run the jar file using <code>java -jar PATH\_TO\_PIANOLEAF\_JAR</code>. You will be prompted to select your Nanoleaf device and MIDI keyboard, then Pianoleaf will be active.
+Download the latest jar file from the [releases](https://github.com/rowak/pianoleaf/releases) page. **Plug your MIDI keyboard into your computer using USB.** Open up a terminal and run the jar file using <code>java -jar PATH\_TO\_PIANOLEAF\_JAR</code>. You will be prompted to select your Nanoleaf device and MIDI keyboard, then Pianoleaf will be active.
 
 You can also use the following command line arguments to skip their corresponding steps in the setup process:
 - -i (--ip)  --  Set the IP address for the Nanoleaf device
