@@ -12,5 +12,5 @@ You can also use the following command line arguments to skip their correspondin
 - -e (--key-end)  -- Set the rightmost key on your MIDI keyboard in the format NOTEOCTAVE (this is usually set to "C8")
 
 ## Effects
-The following is a list of the effects/motions that Pianoleaf has:
-- Map: Horizontally maps each key from the keyboard to the Nanoleaf device. This effect works best on very wide Nanoleaf design layouts.
+The following is a list of the effects/motions that Pianoleaf currently has (more may be added):
+- **Map:** Horizontally maps each key from the keyboard to the Nanoleaf device. This effect works best on very wide Nanoleaf layouts.
