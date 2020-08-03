@@ -160,8 +160,11 @@ public class App {
 		device.close();
 	}
 	
-	// Converts an octave+note pair to its MIDI pitch equivalent.
-	// For example, C4 = 60. Sharps and flats are not recognized.
+	/*
+	 * Converts an octave+note pair to its MIDI pitch equivalent.
+	 * For example, C4 = 60. Sharps and flats are not recognized.
+	 * Based on: https://en.wikipedia.org/wiki/Scientific_pitch_notation
+	 */
 	static int noteToPitch(String note) {
 		note = note.toUpperCase().replace(" ", "");
 		int key = letterToKeyValue(note.charAt(0));
